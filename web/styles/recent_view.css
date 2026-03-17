@@ -326,6 +326,17 @@
         flex-flow: row nowrap;
     }
 
+    .recent-view-unread-mention-and-count-wrapper .recent_topic_actions {
+        /* Unset margin; gap on the wrapper handles spacing. */
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .recent-view-unread-mention-and-count-wrapper .unread_count {
+        /* Unset margin; gap on the wrapper handles spacing. */
+        margin: 0;
+    }
+
     .mention_in_unread {
         opacity: 0.7;
     }
@@ -437,6 +448,13 @@
         }
     }
 
+    & tr .recent_topic_name {
+        /* Extra left padding to make room for the unread marker bar
+           alongside the keyboard selection outline, applied to all
+           rows so topic names align between read and unread rows. */
+        padding-left: 0.75em; /* 12px at 16px/1em */
+    }
+
     .unread_topic {
         & a {
             color: var(--color-recent-view-link-unread);
@@ -445,9 +463,6 @@
 
         .recent_topic_name {
             position: relative;
-            /* Extra left padding to make room for the unread
-               marker bar alongside the keyboard selection outline. */
-            padding-left: 0.75em; /* 12px at 16px/1em */
 
             &::before {
                 content: "";
@@ -551,16 +566,16 @@
     }
 
     .recent-view-topic-header {
-        /* Match horizontal padding with non header rows. */
-        padding: 0.25em 0.5em; /* 4px 8px at 16px/1em */
+        /* Match left padding with row td (.recent_topic_name),
+           including the extra space for the unread marker bar. */
+        padding: 0.25em 0.5em 0.25em 0.75em; /* 4px 8px 4px 12px at 16px/1em */
         /* th no longer has data-sort; the individual sort spans handle
            cursor and hover. */
         cursor: default;
 
         .recent-view-header-wrapper {
             /* Match the row grid so "Channel" and "Conversation" sort
-               spans align with channel and topic text in rows. Sort
-               arrows are inside the spans, so 3 columns suffice.
+               spans align with channel and topic text in rows.
                1em = 16px at 16px/1em, matching the 1em (16px
                at 16px/1em) privacy icon width in data rows. */
             display: grid;
@@ -571,7 +586,7 @@
                     ),
                     33.3%
                 )
-                auto 1fr auto;
+                auto 1fr;
             align-items: center;
         }
 
@@ -608,15 +623,32 @@
             }
         }
 
-        .recent-view-conversation-sort-header {
-            /* Prevent hover pill highlight from extending into
-               the adjacent unread sort column. */
-            margin-right: 0.3125em; /* 5px at 16px/1em */
+        .recent-view-conversation-name-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+            /* Match the padding-left on conversation links so
+               the "Conversation" header aligns with topic names. */
+            padding-left: 2.625em; /* 42px at 16px/1em */
         }
 
         .recent-view-unread-sort-header {
-            margin-right: -0.1563em; /* 2.5px at 16px/1em */
-            justify-self: end;
+            position: absolute;
+            left: 0;
+
+            /* Sort arrow follows the same hover/active pattern
+               as other column headers. */
+            .table-sortable-arrow {
+                opacity: 0;
+            }
+
+            &:hover .table-sortable-arrow {
+                opacity: 0.7;
+            }
+
+            &.active .table-sortable-arrow {
+                opacity: 1;
+            }
         }
     }
 
@@ -670,8 +702,8 @@
         .recent-view-conversation-with-unread-wrapper {
             display: grid;
             grid-template-areas:
-                "conversation-type chevron-right conversation-name unread-mention-and-count"
-                ".                 .             conversation-name .";
+                "conversation-type chevron-right conversation-name"
+                ".                 .             conversation-name";
             width: 100%;
             /* We add 1em for the privacy icon and 8px for the flexbox
                gap between the icon and the channel name. */
@@ -682,7 +714,7 @@
                     ),
                     33.3%
                 )
-                auto 1fr auto;
+                auto 1fr;
             align-items: center;
         }
 
@@ -697,15 +729,45 @@
             }
         }
 
-        .recent-view-conversation-link {
+        .recent-view-conversation-name-wrapper {
             grid-area: conversation-name;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            position: relative;
         }
 
         .recent-view-unread-mention-and-count-wrapper {
-            grid-area: unread-mention-and-count;
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            /* Slightly narrower than the padding-left on conversation
+               links to leave a gap between the count and topic text. */
+            width: 2.25em; /* 36px at 16px/1em */
+            justify-content: flex-end;
+        }
+
+        .recent-view-unread-count-wrapper {
+            display: flex;
+            align-items: center;
+            align-self: stretch;
+            /* Horizontal padding extends the click target beyond
+               the badge without reaching the topic text. */
+            padding: 0 0.375em; /* 0 6px at 16px/1em */
+            margin: 0 -0.375em; /* compensate to keep badge aligned */
+        }
+
+        .recent-view-conversation-link {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            /* Reserve space for the absolutely-positioned unread
+               badge and @ mention marker so topic names align
+               in read and unread rows. */
+            padding-left: 2.625em; /* 42px at 16px/1em */
         }
 
         .zulip-icon-chevron-right {
@@ -863,13 +925,12 @@
     align-self: stretch;
     margin-left: auto;
     flex-direction: row;
+    /* Match the left sidebar gap between @ marker and unread count. */
+    gap: 5px;
 
-    .recent-view-unread-count-wrapper {
-        display: flex;
-        align-items: center;
-        align-self: stretch;
-        /* Horizontal padding extends the click target. */
-        padding: 0 0.375em; /* 0 6px at 16px/1em */
+    .unread_mention_info {
+        /* Unset margin in favor of flex gap. */
+        margin: 0;
     }
 }
 
