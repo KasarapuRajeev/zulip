@@ -635,6 +635,11 @@
         .recent-view-unread-sort-header {
             position: absolute;
             left: 0;
+            /* Match the data row wrapper width so the arrow
+               right-aligns directly above the unread counters. */
+            width: 2.25em; /* 36px at 16px/1em */
+            display: flex;
+            justify-content: flex-end;
 
             /* Sort arrow follows the same hover/active pattern
                as other column headers. */
